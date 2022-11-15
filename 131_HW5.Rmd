@@ -6,5 +6,120 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache.extra = rand_seed)
 ```
+
+```{r, message=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library(glmnet)
+# installing and loading janitor package
+library(janitor)
+tidymodels_prefer()
+
+# uploading file to into R
+pokemon <- read_csv("/Users/zackreardon/Downloads/homework-5/data/Pokemon.csv")
+```
+
+Exercise 1
+
+```{r}
+# show classes in pokemon data
+sapply(pokemon, class)
+
+# show portion of initial names in pokemon data
+pokemon$Name %>%
+  head()
+
+# replace pokemon data with a clean_names version
+pokemon <- clean_names(pokemon)
+
+# show new classes after cleaning names in pokemon data
+sapply(pokemon, class)
+
+# show portion of new names in pokemon data
+pokemon$name %>%
+  head()
+```
+The class names in the data were converted to all lowercase letters, punctuation was removed, and the spaces were replaced with "_". This could be useful since it creates consistency when referencing class names when working with the dataset.
+
+Exercise 2
+
+```{r}
+# creating a bar chart of variable type_1
+ggplot(pokemon, aes(x=type_1)) + geom_bar()
+
+# assessing number of classes of variable type_1
+length(unique(pokemon$type_1))
+```
+There are 18 classes of the outcome `type_1`. Flying and fairy could be considered to have very few pokemon.
+
+```{r}
+# filter dataset to specific type_1
+pokemon <- pokemon %>%
+  subset(type_1=c(Bug, Fire, Grass, Normal, Water, Psychic))
+
+# converting type_1 and legendary to factors
+pokemon$type_1 <- as.factor(pokemon$type_1)
+pokemon$legendary <- as.factor(pokemon$legendary)
+```
+
+Exercise 3
+
+```{r}
+# setting seed for repeatability
+set.seed(100)
+
+# performing initial split with 80% training, 20% testing and stratifying on type_1
+pokemon_split <- initial_split(pokemon, prop=0.8, strata=type_1)
+
+# assigning training and testing sets
+pokemon_train <- training(pokemon_split)
+pokemon_test <- testing(pokemon_split)
+
+# verifying number of observations in training and testing sets
+dim(pokemon_train)
+dim(pokemon_test)
+```
+The training set has 639 observations while the testing set has 161 observations.
+
+```{r}
+# using v-fold cross validation on training set with 5 folds and stratifying on type_1
+pokemon_folds <- vfold_cv(pokemon_train, v=5, strata=type_1)
+```
+Stratifying the folds might be useful since it would ensure that similar proportions of each primary type exist in each fold and allow for better comparisons between the predictability of each fold.
+
+Exercise 4
+
+```{r}
+# creating recipe for relationship between predictor variables and response
+pokemon_recipe <- recipe(type_1 ~ legendary + generation + sp_atk + attack + speed + defense + hp + sp_def, data=pokemon_train) %>%
+  # dummy coding categorical predictors
+  step_dummy(legendary, generation) %>%
+  # centering and scaling all predictors
+  step_center(all_predictors()) %>%
+  step_scale(all_predictors())
+```
+
+Exercise 5
+
+```{r}
+# setting up elastic net model
+en_spec <- multinom_reg(mixture=0, penalty=0) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+
+# creating workflow
+en_workflow <- workflow() %>%
+  add_recipe(pokemon_recipe) %>%
+  add_model(en_spec)
+```
+
+Exercise 6
+
+Exercise 7
+
+Exercise 8
