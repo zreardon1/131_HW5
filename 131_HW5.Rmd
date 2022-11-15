@@ -140,6 +140,7 @@ load("tune_en.rda")
 autoplot(tune_en)
 ```
 
+It appears that a lower penalty typically produces higher accuracy and ROC AUC. Smaller values of penalty and mixture should correspond to better accuracy and ROC AUC.
 
 Exercise 7
 
