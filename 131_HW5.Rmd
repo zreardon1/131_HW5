@@ -59,8 +59,7 @@ There are 18 classes of the outcome `type_1`. Flying could be considered to have
 
 ```{r}
 # filter dataset to specific type_1
-pokemon <- pokemon %>%
-  subset(type_1=c(Bug, Fire, Grass, Normal, Water, Psychic))
+pokemon <- filter(pokemon, type_1 %in% c("Bug", "Fire", "Grass", "Normal", "Water", "Psychic"))
 
 # converting type_1 and legendary to factors
 pokemon$type_1 <- as.factor(pokemon$type_1)
@@ -98,7 +97,7 @@ Exercise 4
 # creating recipe for relationship between predictor variables and response
 pokemon_recipe <- recipe(type_1 ~ legendary + generation + sp_atk + attack + speed + defense + hp + sp_def, data=pokemon_train) %>%
   # dummy coding categorical predictors
-  step_dummy(legendary, generation) %>%
+  step_dummy(all_nominal_predictors()) %>%
   # centering and scaling all predictors
   step_center(all_predictors()) %>%
   step_scale(all_predictors())
@@ -117,12 +116,30 @@ en_workflow <- workflow() %>%
   add_recipe(pokemon_recipe) %>%
   add_model(en_spec)
 
-# creating grids for penalty and mixture
-mixture_grid <- grid_regular(mixture(range=c(0,1)), levels=10)
-penalty_grid <- grid_regular(penalty(range=c(-5,5)), levels=10)
+# creating a grid for penalty and mixture
+en_grid <- grid_regular(mixture(range=c(0,1)),penalty(range=c(-5,5)), levels=10)
 ```
+We will fit 500 models in total when we fit these models to our folded data.
 
 Exercise 6
+
+```{r, eval=FALSE}
+# fitting models to folded data
+tune_en <- tune_grid(
+  en_workflow,
+  resamples = pokemon_folds, 
+  grid = en_grid)
+
+save(tune_en, file="tune_en.rda")
+```
+
+```{r}
+load("tune_en.rda")
+
+# use autoplot on results
+autoplot(tune_en)
+```
+
 
 Exercise 7
 
