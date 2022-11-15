@@ -108,7 +108,7 @@ Exercise 5
 
 ```{r}
 # setting up elastic net model
-en_spec <- multinom_reg(mixture=0, penalty=0) %>%
+en_spec <- multinom_reg(mixture=tune(), penalty=tune()) %>%
   set_mode("classification") %>%
   set_engine("glmnet")
 
@@ -116,6 +116,10 @@ en_spec <- multinom_reg(mixture=0, penalty=0) %>%
 en_workflow <- workflow() %>%
   add_recipe(pokemon_recipe) %>%
   add_model(en_spec)
+
+# creating grids for penalty and mixture
+mixture_grid <- grid_regular(mixture(range=c(0,1)), levels=10)
+penalty_grid <- grid_regular(penalty(range=c(-5,5)), levels=10)
 ```
 
 Exercise 6

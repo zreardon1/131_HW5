@@ -262,14 +262,18 @@ pokemon_recipe &lt;- recipe(type_1 ~ legendary + generation + sp_atk + attack + 
   step_scale(all_predictors())</code></pre>
 <p>Exercise 5</p>
 <pre class="r"><code># setting up elastic net model
-en_spec &lt;- multinom_reg(mixture=0, penalty=0) %&gt;%
+en_spec &lt;- multinom_reg(mixture=tune(), penalty=tune()) %&gt;%
   set_mode(&quot;classification&quot;) %&gt;%
   set_engine(&quot;glmnet&quot;)
 
 # creating workflow
 en_workflow &lt;- workflow() %&gt;%
   add_recipe(pokemon_recipe) %&gt;%
-  add_model(en_spec)</code></pre>
+  add_model(en_spec)
+
+# creating grids for penalty and mixture
+mixture_grid &lt;- grid_regular(mixture(range=c(0,1)), levels=10)
+penalty_grid &lt;- grid_regular(penalty(range=c(-5,5)), levels=10)</code></pre>
 <p>Exercise 6</p>
 <p>Exercise 7</p>
 <p>Exercise 8</p>
