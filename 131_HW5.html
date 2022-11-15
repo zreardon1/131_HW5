@@ -224,7 +224,7 @@ ggplot(pokemon, aes(x=type_1)) + geom_bar()</code></pre>
 <pre class="r"><code># assessing number of classes of variable type_1
 length(unique(pokemon$type_1))</code></pre>
 <pre><code>## [1] 18</code></pre>
-<p>There are 18 classes of the outcome <code>type_1</code>. Flying and fairy could be considered to have very few pokemon.</p>
+<p>There are 18 classes of the outcome <code>type_1</code>. Flying could be considered to have very few pokemon.</p>
 <pre class="r"><code># filter dataset to specific type_1
 pokemon &lt;- pokemon %&gt;%
   subset(type_1=c(Bug, Fire, Grass, Normal, Water, Psychic))

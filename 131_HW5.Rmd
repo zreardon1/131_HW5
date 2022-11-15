@@ -55,7 +55,7 @@ ggplot(pokemon, aes(x=type_1)) + geom_bar()
 # assessing number of classes of variable type_1
 length(unique(pokemon$type_1))
 ```
-There are 18 classes of the outcome `type_1`. Flying and fairy could be considered to have very few pokemon.
+There are 18 classes of the outcome `type_1`. Flying could be considered to have very few pokemon.
 
 ```{r}
 # filter dataset to specific type_1
