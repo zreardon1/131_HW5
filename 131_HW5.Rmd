@@ -156,11 +156,23 @@ en_final <- finalize_workflow(en_workflow, best_penalty)
 en_final_fit <- fit(en_final, data = pokemon_train)
 
 # applying final model on testing set
-augment(en_final_fit, new_data = pokemon_test)
+predicted_data <- augment(en_final_fit, new_data = pokemon_test) %>%
+  select(type_1, starts_with(".pred"))
 ```
 
 Exercise 8
 
 ```{r}
+# calculate overall ROC AUC on testing set
+predicted_data %>% roc_auc(type_1, .pred_Bug:.pred_Water)
 
+# create plots of the different ROC curves
+predicted_data %>% roc_curve(type_1, .pred_Bug:.pred_Water) %>% autoplot()
+
+# make heat map of the confusoin matrix
+predicted_data %>%
+  conf_mat(truth = type_1, .pred_class) %>%
+  autoplot(type="heatmap")
 ```
+
+It appears that the model isn't super effective based on the confusion matrix. The model performed better than a coin flip since the ROC AUC was greater than 0.5. However, the ROC AUC value of 0.677 does not represent a very accurate model. The model was most effective at predicting normal primary types. This may be because pokemons in that class tend to display similar characteristics. The model is least effective at predicting fire and water types. This may be because there is greater diversity in the characteristics exhibited by pokemons in these classes.
