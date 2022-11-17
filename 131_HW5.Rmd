@@ -18,6 +18,7 @@ library(ggplot2)
 library(glmnet)
 # installing and loading janitor package
 library(janitor)
+library(pROC)
 tidymodels_prefer()
 
 # uploading file to into R
@@ -144,4 +145,22 @@ It appears that a lower penalty typically produces higher accuracy and ROC AUC. 
 
 Exercise 7
 
+```{r}
+# selecting model with best roc auc
+best_penalty <- select_best(tune_en, metric="roc_auc")
+
+# finalizing workflow
+en_final <- finalize_workflow(en_workflow, best_penalty)
+
+# fitting best model on whole training set
+en_final_fit <- fit(en_final, data = pokemon_train)
+
+# applying final model on testing set
+augment(en_final_fit, new_data = pokemon_test)
+```
+
 Exercise 8
+
+```{r}
+
+```
